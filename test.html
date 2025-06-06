@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест на знание эндуро-кроссовых мотоциклов</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <style>
+        :where([class^="ri-"])::before { content: "\f3c2"; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+        .option-card {
+            transition: all 0.3s ease;
+        }
+        .option-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .option-card.selected {
+            border-color: #4f46e5;
+            background-color: #eef2ff;
+        }
+        input[type="radio"] {
+            display: none;
+        }
+    </style>
+    <script>tailwind.config={theme:{extend:{colors:{primary:'#4f46e5',secondary:'#f43f5e'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+</head>
+<body class="min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Тест на знание эндуро-кроссовых мотоциклов</h1>
+            <p class="text-gray-600 mb-6">Проверьте свои знания о мотоциклах Honda, Kawasaki, Yamaha, Husqvarna и Avantis</p>
+            
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-gray-700" id="question-counter">Вопрос 1 из 15</span>
+                <span class="text-sm font-medium text-gray-700" id="score-display">Счет: 0</span>
+            </div>
+            
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div class="bg-primary h-2.5 rounded-full" id="progress-bar" style="width: 6.67%"></div>
+            </div>
+        </header>
+        
+        <main>
+            <div id="quiz-container" class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <div id="question-container" class="mb-6">
+                    <!-- Вопрос будет загружен с помощью JavaScript -->
+                </div>
+                
+                <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    <!-- Варианты ответов будут загружены с помощью JavaScript -->
+                </div>
+                
+                <div class="flex justify-between">
+                    <button id="prev-button" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-button font-medium hover:bg-gray-300 transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="ri-arrow-left-line mr-2"></i>Предыдущий
+                    </button>
+                    <button id="skip-button" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-button font-medium hover:bg-gray-300 transition-colors whitespace-nowrap">
+                        Пропустить
+                    </button>
+                    <button id="next-button" class="px-6 py-2 bg-primary text-white rounded-button font-medium hover:bg-indigo-600 transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed">
+                        Следующий<i class="ri-arrow-right-line ml-2"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="results-container" class="bg-white rounded-lg shadow-md p-8 text-center hidden">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">Результаты теста</h2>
+                <div class="mb-6">
+                    <div class="text-5xl font-bold text-primary mb-2" id="final-score">0/15</div>
+                    <div class="text-xl text-gray-600 mb-4" id="percentage">0%</div>
+                    <div class="w-full bg-gray-200 rounded-full h-4 mb-6">
+                        <div class="bg-primary h-4 rounded-full" id="final-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div id="feedback" class="mb-8 text-left p-4 rounded-lg bg-gray-50">
+                    <h3 class="font-bold text-lg mb-2">Ваш результат:</h3>
+                    <p class="text-gray-700 mb-4" id="feedback-text"></p>
+                    <h4 class="font-bold mb-2">Рекомендации:</h4>
+                    <ul class="list-disc pl-5 text-gray-700" id="recommendations">
+                        <!-- Рекомендации будут добавлены с помощью JavaScript -->
+                    </ul>
+                </div>
+                
+                <button id="restart-button" class="px-6 py-3 bg-primary text-white rounded-button font-medium hover:bg-indigo-600 transition-colors whitespace-nowrap">
+                    <i class="ri-refresh-line mr-2"></i>Пройти тест заново
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <script id="quiz-data">
+        const questions = [
+            {
+                question: "Какой объем двигателя имеет Honda CRF450R?",
+                options: ["250 куб. см", "350 куб. см", "450 куб. см", "500 куб. см"],
+                correctAnswer: 2,
+                explanation: "Honda CRF450R оснащена четырехтактным двигателем объемом 450 куб. см."
+            },
+            {
+                question: "Какой мотоцикл изображен на картинке?",
+                image: "https://readdy.ai/api/search-image?query=Husqvarna%20FC%20450%20motocross%20motorcycle%20on%20dirt%20track%2C%20clear%20detailed%20view%20of%20the%20entire%20bike%2C%20professional%20product%20photography%2C%20white%20and%20blue%20color%20scheme%2C%20sharp%20focus%2C%20studio%20lighting&width=800&height=500&seq=1&orientation=landscape",
+                options: ["Kawasaki KX450", "Husqvarna FC 450", "Yamaha YZ450F", "Honda CRF450R"],
+                correctAnswer: 1,
+                explanation: "На изображении представлен Husqvarna FC 450, узнаваемый по характерному бело-синему цветовому оформлению."
+            },
+            {
+                question: "Какой тип подвески используется на большинстве современных эндуро-мотоциклов?",
+                options: ["Маятниковая подвеска", "Перевернутая вилка (USD)", "Телескопическая вилка", "Моноамортизатор"],
+                correctAnswer: 1,
+                explanation: "Большинство современных эндуро-мотоциклов оснащаются перевернутой вилкой (USD - Upside Down), которая обеспечивает лучшую жесткость и управляемость."
+            },
+            {
+                question: "Какая компания производит мотоциклы серии KX?",
+                options: ["Honda", "Yamaha", "Kawasaki", "Husqvarna"],
+                correctAnswer: 2,
+                explanation: "Серия KX производится компанией Kawasaki. Это линейка мотоциклов для мотокросса."
+            },
+            {
+                question: "Какой мотоцикл изображен на картинке?",
+                image: "https://readdy.ai/api/search-image?query=Yamaha%20YZ250F%20motocross%20motorcycle%20on%20dirt%20track%2C%20clear%20detailed%20view%20of%20the%20entire%20bike%2C%20professional%20product%20photography%2C%20blue%20color%20scheme%20with%20white%20accents%2C%20sharp%20focus%2C%20studio%20lighting&width=800&height=500&seq=2&orientation=landscape",
+                options: ["Yamaha YZ250F", "Kawasaki KX250", "Honda CRF250R", "Husqvarna FC 250"],
+                correctAnswer: 0,
+                explanation: "На изображении представлен Yamaha YZ250F, узнаваемый по характерному сине-белому цветовому оформлению."
+            },
+            {
+                question: "Какая технология впрыска топлива используется в современных кроссовых мотоциклах Honda?",
+                options: ["Карбюратор", "PGM-FI (Programmed Fuel Injection)", "TPI (Transfer Port Injection)", "EFI (Electronic Fuel Injection)"],
+                correctAnswer: 1,
+                explanation: "Honda использует технологию PGM-FI (Programmed Fuel Injection) в своих современных кроссовых мотоциклах для более точного впрыска топлива."
+            },
+            {
+                question: "Какой материал чаще всего используется для изготовления рамы современных эндуро-мотоциклов?",
+                options: ["Углеволокно", "Титан", "Алюминиевый сплав", "Хромомолибденовая сталь"],
+                correctAnswer: 2,
+                explanation: "Алюминиевый сплав является наиболее распространенным материалом для изготовления рам современных эндуро-мотоциклов благодаря оптимальному сочетанию прочности и легкости."
+            },
+            {
+                question: "Какой мотоцикл изображен на картинке?",
+                image: "https://readdy.ai/api/search-image?query=Kawasaki%20KX450%20motocross%20motorcycle%20on%20dirt%20track%2C%20clear%20detailed%20view%20of%20the%20entire%20bike%2C%20professional%20product%20photography%2C%20green%20color%20scheme%2C%20sharp%20focus%2C%20studio%20lighting&width=800&height=500&seq=3&orientation=landscape",
+                options: ["Honda CRF450R", "Yamaha YZ450F", "Kawasaki KX450", "Husqvarna FC 450"],
+                correctAnswer: 2,
+                explanation: "На изображении представлен Kawasaki KX450, узнаваемый по характерному зеленому цветовому оформлению, которое является фирменным для бренда Kawasaki."
+            },
+            {
+                question: "Какая особенность отличает двигатели Yamaha YZ-F от конкурентов?",
+                options: ["Жидкостное охлаждение", "Обратный цилиндр с задним впуском", "Двойной распредвал", "Электростартер"],
+                correctAnswer: 1,
+                explanation: "Yamaha YZ-F отличается обратным расположением цилиндра с задним впуском, что позволяет оптимизировать распределение веса и улучшить управляемость мотоцикла."
+            },
+            {
+                question: "Какой объем двигателя имеет Husqvarna TE300i?",
+                options: ["250 куб. см", "300 куб. см", "350 куб. см", "450 куб. см"],
+                correctAnswer: 1,
+                explanation: "Husqvarna TE300i оснащен двухтактным двигателем объемом 300 куб. см с технологией впрыска топлива TPI."
+            },
+            {
+                question: "Какой мотоцикл изображен на картинке?",
+                image: "https://readdy.ai/api/search-image?query=Avantis%20Enduro%20300%20Pro%20motocross%20motorcycle%20on%20dirt%20track%2C%20clear%20detailed%20view%20of%20the%20entire%20bike%2C%20professional%20product%20photography%2C%20red%20and%20black%20color%20scheme%2C%20sharp%20focus%2C%20studio%20lighting&width=800&height=500&seq=4&orientation=landscape",
+                options: ["Honda CRF300L", "Yamaha WR250F", "Avantis Enduro 300 Pro", "Kawasaki KLX300R"],
+                correctAnswer: 2,
+                explanation: "На изображении представлен Avantis Enduro 300 Pro, узнаваемый по характерному красно-черному цветовому оформлению."
+            },
+            {
+                question: "Какая система сцепления используется в большинстве современных кроссовых мотоциклов?",
+                options: ["Сухое однодисковое сцепление", "Мокрое многодисковое сцепление", "Центробежное сцепление", "Вариаторная трансмиссия"],
+                correctAnswer: 1,
+                explanation: "Большинство современных кроссовых мотоциклов оснащаются мокрым многодисковым сцеплением, которое обеспечивает лучшее охлаждение и более длительный срок службы."
+            },
+            {
+                question: "Какая компания первой представила технологию впрыска масла в двухтактных эндуро-мотоциклах?",
+                options: ["Honda", "KTM", "Yamaha", "Husqvarna"],
+                correctAnswer: 1,
+                explanation: "KTM первой представила технологию TPI (Transfer Port Injection) для двухтактных эндуро-мотоциклов, которая позволяет отказаться от предварительного смешивания масла с топливом."
+            },
+            {
+                question: "Какой мотоцикл изображен на картинке?",
+                image: "https://readdy.ai/api/search-image?query=Honda%20CRF450R%20motocross%20motorcycle%20on%20dirt%20track%2C%20clear%20detailed%20view%20of%20the%20entire%20bike%2C%20professional%20product%20photography%2C%20red%20color%20scheme%2C%20sharp%20focus%2C%20studio%20lighting&width=800&height=500&seq=5&orientation=landscape",
+                options: ["Honda CRF450R", "Yamaha YZ450F", "Kawasaki KX450", "Husqvarna FC 450"],
+                correctAnswer: 0,
+                explanation: "На изображении представлен Honda CRF450R, узнаваемый по характерному красному цветовому оформлению, которое является фирменным для бренда Honda."
+            },
+            {
+                question: "Какой тип тормозной системы используется на современных эндуро-мотоциклах?",
+                options: ["Барабанные тормоза", "Дисковые гидравлические тормоза", "Механические дисковые тормоза", "Комбинированные тормоза"],
+                correctAnswer: 1,
+                explanation: "Современные эндуро-мотоциклы оснащаются дисковыми гидравлическими тормозами, которые обеспечивают лучшую тормозную мощность и контроль."
+            }
+        ];
+    </script>
+
+    <script id="quiz-functionality">
+        document.addEventListener('DOMContentLoaded', function() {
+            let currentQuestion = 0;
+            let score = 0;
+            let userAnswers = Array(questions.length).fill(null);
+            
+            const questionContainer = document.getElementById('question-container');
+            const optionsContainer = document.getElementById('options-container');
+            const nextButton = document.getElementById('next-button');
+            const prevButton = document.getElementById('prev-button');
+            const skipButton = document.getElementById('skip-button');
+            const progressBar = document.getElementById('progress-bar');
+            const questionCounter = document.getElementById('question-counter');
+            const scoreDisplay = document.getElementById('score-display');
+            const quizContainer = document.getElementById('quiz-container');
+            const resultsContainer = document.getElementById('results-container');
+            const finalScore = document.getElementById('final-score');
+            const percentage = document.getElementById('percentage');
+            const finalProgress = document.getElementById('final-progress');
+            const feedbackText = document.getElementById('feedback-text');
+            const recommendations = document.getElementById('recommendations');
+            const restartButton = document.getElementById('restart-button');
+            
+            function loadQuestion(index) {
+                const question = questions[index];
+                
+                // Обновляем счетчик вопросов и прогресс-бар
+                questionCounter.textContent = `Вопрос ${index + 1} из ${questions.length}`;
+                progressBar.style.width = `${((index + 1) / questions.length) * 100}%`;
+                
+                // Загружаем вопрос
+                let questionHTML = `<h2 class="text-xl font-bold text-gray-900 mb-4">${question.question}</h2>`;
+                
+                // Добавляем изображение, если оно есть
+                if (question.image) {
+                    questionHTML += `
+                        <div class="mb-6 rounded-lg overflow-hidden">
+                            <img src="${question.image}" alt="Вопрос с изображением" class="w-full h-auto object-cover">
+                        </div>
+                    `;
+                }
+                
+                questionContainer.innerHTML = questionHTML;
+                
+                // Загружаем варианты ответов
+                optionsContainer.innerHTML = '';
+                
+                question.options.forEach((option, optionIndex) => {
+                    const isSelected = userAnswers[index] === optionIndex;
+                    const optionCard = document.createElement('div');
+                    optionCard.className = `option-card p-4 border rounded-lg cursor-pointer ${isSelected ? 'selected' : 'border-gray-200'}`;
+                    optionCard.innerHTML = `
+                        <input type="radio" name="question-${index}" id="option-${optionIndex}" ${isSelected ? 'checked' : ''}>
+                        <label for="option-${optionIndex}" class="flex items-center cursor-pointer">
+                            <span class="flex items-center justify-center w-6 h-6 rounded-full border ${isSelected ? 'bg-primary border-primary' : 'border-gray-300'} mr-3">
+                                ${isSelected ? '<i class="ri-check-line text-white"></i>' : ''}
+                            </span>
+                            <span>${option}</span>
+                        </label>
+                    `;
+                    
+                    optionCard.addEventListener('click', () => selectOption(optionIndex));
+                    optionsContainer.appendChild(optionCard);
+                });
+                
+                // Обновляем состояние кнопок
+                prevButton.disabled = index === 0;
+                nextButton.textContent = index === questions.length - 1 ? 'Завершить тест' : 'Следующий';
+                nextButton.innerHTML = index === questions.length - 1 ? 'Завершить тест' : 'Следующий<i class="ri-arrow-right-line ml-2"></i>';
+            }
+            
+            function selectOption(optionIndex) {
+                userAnswers[currentQuestion] = optionIndex;
+                
+                // Обновляем стили выбранного варианта
+                const optionCards = optionsContainer.querySelectorAll('.option-card');
+                optionCards.forEach((card, index) => {
+                    if (index === optionIndex) {
+                        card.classList.add('selected');
+                        card.classList.remove('border-gray-200');
+                        card.querySelector('input').checked = true;
+                        card.querySelector('span.flex').classList.add('bg-primary', 'border-primary');
+                        card.querySelector('span.flex').classList.remove('border-gray-300');
+                        card.querySelector('span.flex').innerHTML = '<i class="ri-check-line text-white"></i>';
+                    } else {
+                        card.classList.remove('selected');
+                        card.classList.add('border-gray-200');
+                        card.querySelector('input').checked = false;
+                        card.querySelector('span.flex').classList.remove('bg-primary', 'border-primary');
+                        card.querySelector('span.flex').classList.add('border-gray-300');
+                        card.querySelector('span.flex').innerHTML = '';
+                    }
+                });
+            }
+            
+            function nextQuestion() {
+                if (currentQuestion < questions.length - 1) {
+                    currentQuestion++;
+                    loadQuestion(currentQuestion);
+                } else {
+                    showResults();
+                }
+            }
+            
+            function prevQuestion() {
+                if (currentQuestion > 0) {
+                    currentQuestion--;
+                    loadQuestion(currentQuestion);
+                }
+            }
+            
+            function skipQuestion() {
+                userAnswers[currentQuestion] = null;
+                nextQuestion();
+            }
+            
+            function calculateScore() {
+                score = 0;
+                userAnswers.forEach((answer, index) => {
+                    if (answer === questions[index].correctAnswer) {
+                        score++;
+                    }
+                });
+                return score;
+            }
+            
+            function showResults() {
+                const finalScore = calculateScore();
+                const percentageValue = Math.round((finalScore / questions.length) * 100);
+                
+                document.getElementById('final-score').textContent = `${finalScore}/${questions.length}`;
+                document.getElementById('percentage').textContent = `${percentageValue}%`;
+                document.getElementById('final-progress').style.width = `${percentageValue}%`;
+                
+                // Формируем обратную связь
+                let feedback = '';
+                let recommendationsList = [];
+                
+                if (percentageValue >= 90) {
+                    feedback = 'Отлично! Вы настоящий эксперт в области эндуро-кроссовых мотоциклов.';
+                    recommendationsList = [
+                        'Попробуйте углубиться в технические особенности новейших моделей',
+                        'Изучите профессиональные настройки подвески для разных типов трасс',
+                        'Рассмотрите возможность участия в соревнованиях или мастер-классах'
+                    ];
+                } else if (percentageValue >= 70) {
+                    feedback = 'Хороший результат! Вы хорошо разбираетесь в эндуро-кроссовых мотоциклах.';
+                    recommendationsList = [
+                        'Обратите внимание на технические различия между брендами',
+                        'Изучите особенности настройки подвески и двигателя',
+                        'Посетите мотоциклетные выставки для знакомства с новыми моделями'
+                    ];
+                } else if (percentageValue >= 50) {
+                    feedback = 'Неплохой результат. У вас есть базовые знания об эндуро-кроссовых мотоциклах.';
+                    recommendationsList = [
+                        'Изучите основные технические характеристики популярных моделей',
+                        'Ознакомьтесь с особенностями разных типов подвески и двигателей',
+                        'Посетите мотосалоны для получения практического опыта'
+                    ];
+                } else {
+                    feedback = 'Есть куда расти! Рекомендуем углубить свои знания об эндуро-кроссовых мотоциклах.';
+                    recommendationsList = [
+                        'Начните с изучения основных типов и классификаций мотоциклов',
+                        'Ознакомьтесь с базовыми техническими терминами и характеристиками',
+                        'Подпишитесь на тематические журналы и каналы для расширения кругозора'
+                    ];
+                }
+                
+                feedbackText.textContent = feedback;
+                
+                recommendations.innerHTML = '';
+                recommendationsList.forEach(rec => {
+                    const li = document.createElement('li');
+                    li.textContent = rec;
+                    li.className = 'mb-1';
+                    recommendations.appendChild(li);
+                });
+                
+                // Показываем результаты
+                quizContainer.classList.add('hidden');
+                resultsContainer.classList.remove('hidden');
+            }
+            
+            function restartQuiz() {
+                currentQuestion = 0;
+                score = 0;
+                userAnswers = Array(questions.length).fill(null);
+                scoreDisplay.textContent = 'Счет: 0';
+                
+                resultsContainer.classList.add('hidden');
+                quizContainer.classList.remove('hidden');
+                
+                loadQuestion(currentQuestion);
+            }
+            
+            // Инициализация
+            loadQuestion(currentQuestion);
+            
+            // Обработчики событий
+            nextButton.addEventListener('click', nextQuestion);
+            prevButton.addEventListener('click', prevQuestion);
+            skipButton.addEventListener('click', skipQuestion);
+            restartButton.addEventListener('click', restartQuiz);
+        });
+    </script>
+</body>
+</html>
